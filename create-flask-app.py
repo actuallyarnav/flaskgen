@@ -1,4 +1,4 @@
-import os, venv, subprocess, glob
+import os, venv, subprocess, glob,urllib.request, json
 
 # START TEXT CHUNKS
 APP_PY_TEXT = """from flask import Flask, render_template, request, redirect, url_for, send_from_directory, flash
@@ -165,16 +165,34 @@ README_TEXT = """# Project
 # END TEXT CHUNKS
 
 # HELPER FUNCTIONS
-BOOTSTRAP_CDN = "https://github.com/twbs/bootstrap/releases/download/v5.3.8/bootstrap-5.3.8-dist.zip"
 
+#write file
 def write_file(project_dir, path, content):
     fullpath = os.path.join(project_dir, path)
     with open(fullpath, "w") as f:
         f.write(content)
     print(f"Created {path}")
 
+#get latest bootstrap release using github api
+def get_latest_bootstrap_release():
+    api_url = "https://api.github.com/repos/twbs/bootstrap/releases/latest"
+
+    with urllib.request.urlopen(api_url) as response:
+        data = json.load(response)
+
+    for asset in data["assets"]:
+        if "dist.zip" in asset["name"]:
+            return asset["browser_download_url"]
+
+    return None
+
+#download bootstrap from github releases
 def get_bootstrap(PROJECT_DIR):
-    subprocess.run(["wget", "--directory-prefix",PROJECT_DIR, BOOTSTRAP_CDN])
+    url = get_latest_bootstrap_release()
+    if url:
+        subprocess.run(["wget", "--directory-prefix",PROJECT_DIR, url])
+    else:
+        print("ERROR: could not find Bootstrap release")
     bootstrap_zip = glob.glob(os.path.join(PROJECT_DIR, "bootstrap-*.zip"))[0]
     
     subprocess.run(["unzip", "-d", PROJECT_DIR, bootstrap_zip])
