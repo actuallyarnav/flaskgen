@@ -1,1 +1,3 @@
+flaskgen.egg-info/
 build/
+flaskgen/__pycache__
