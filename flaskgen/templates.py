@@ -91,7 +91,7 @@ HOME_HTML = """{% extends 'base.html' %} {% block head %}
     {% endblock %}
     """
 
-ENV_TEXT = """# .env
+ENV_TEXT = ""import venv"# .env
     SECRET_KEY=super-secret-key
     """
 
